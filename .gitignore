@@ -2,3 +2,5 @@
 /projet/media
 /animation_env
 .DS_Store
+/fourier/__pycache__
+/fourier/media

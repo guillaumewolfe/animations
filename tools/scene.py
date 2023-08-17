@@ -1,5 +1,5 @@
 from manim import *
-from neural_network_ajust import NeuralNetworkMobject
+from neural_network import NeuralNetworkMobject
 
 class neuralNetwork(Scene):
     def construct(self):
