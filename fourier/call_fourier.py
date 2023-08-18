@@ -2,7 +2,6 @@ from fourierClass import FourierClass
 from manim import *
 import math
 from fourierClass import FourierClass
-
 class CircularSystem:
     def __init__(self, radius, frequency, phase):
         self.radius = radius
@@ -24,29 +23,35 @@ class CircularSystem:
         # Update the vector's start and end to match the new origin and dot's position
         #self.vector.become(Line(origin, self.dot.get_center(), color=BLUE_C,stroke_width=1))
         direction = self.dot.get_center() - origin
-        self.vector.become(Vector(direction, color=BLUE_C, stroke_width=1,tip_length=0.1,buff=0).shift(origin))
+        self.vector.become(Vector(direction, color=BLUE_C, stroke_width=0.5,tip_length=0.1,buff=0).shift(origin))
 
         self.circle.move_to(origin)
         return self.dot.get_center()
 fichier = "train.csv"
-
+mon_index = 10
 def constructeur_system(fichier):
-            maFonction = FourierClass(fichier)
+            maFonction = FourierClass(fichier,mon_index)
             liste_points = maFonction.fourier_transform()
+            liste_points = sorted(liste_points, key=lambda x: x['amp'], reverse=True)
+            amp=[]
             systems=[]
             for index,i in enumerate(liste_points):
-                if index%50==0:
-                    systems.append(CircularSystem(i["amp"]/10,i["freq"],i["phase"]))
+                amp.append(i["amp"])
+                systems.append(CircularSystem(i["amp"]/80,i["freq"],i["phase"]))
+            print(amp[:10])
             return systems
+
 class CircularMotion(Scene):
     def construct(self):
         self.camera.background_color = DARKER_GRAY
         self.system_shift = 0
-        systems = [
-            CircularSystem(1, 0, 0),#Amplitude,frequence,phase
-            CircularSystem(0.7, 1, 3)]
-        #systems = constructeur_system(fichier)
-        systems[-1].dot.scale(2.5).set_color(YELLOW)
+        '''systems = [
+            CircularSystem(1, 1/15, 0),#Amplitude,frequence,phase
+            CircularSystem(0.7, 1, 3),
+            CircularSystem(0.4, -1, 3),
+            CircularSystem(0.05, 1, 3)]'''
+        systems = constructeur_system(fichier)
+        systems[-1].dot.scale(1.1).set_color(YELLOW)
         for system in systems:
             self.add(system.circle, system.dot, system.vector)
 
@@ -63,11 +68,11 @@ class CircularMotion(Scene):
         self.add(group)
         
 
-        path = TracedPath(systems[-1].dot.get_center, stroke_color=PINK, stroke_width=3.0).set_stroke(opacity=0.6)
+        path = TracedPath(systems[-1].dot.get_center, stroke_color=PINK, stroke_width=4.0).set_stroke(opacity=1)
         self.add(path)
 
         # Play the animation for 10 seconds
-        self.wait(15)
+        self.wait(10)
 
         # Remove the updater
         group.remove_updater(update_systems)

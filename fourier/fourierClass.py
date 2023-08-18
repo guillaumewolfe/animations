@@ -6,31 +6,31 @@ import csv
 
 class FourierClass(VGroup):
 
-    def __init__(self,file,*args, **kwargs):
-        self.imageFunction = self.csv_to_complex(file)
+    def __init__(self,file,index=1,*args, **kwargs):
         VGroup.__init__(self, *args, **kwargs)
+        self.index=index
+        self.x = self.csv_to_complex(file)
         
 
 
     def fourier_transform(self):
         X = []
-        N = len(self.imageFunction)
+        N = len(self.x)
         for k in range(N):
             sum_complex = 0 + 0j  # Initialize complex sum
             
             for n in range(N):
-                angle = 2 * PI * k * n / N
-                c = math.cos(angle) - math.sin(angle) * 1j
-                sum_complex += self.imageFunction[n] * c  # Add the product to the sum
+                angle = (2 * PI * k * n) / N
+                c = complex(math.cos(angle),-math.sin(angle))
+                sum_complex += self.x[n] * c  # Add the product to the sum
 
             # Scale the real and imaginary parts by 1/N
             sum_complex = complex(sum_complex.real / N, sum_complex.imag / N)
 
             frequence = k
-            amplitude = abs(sum_complex)  # This gives the magnitude of the complex number
+            amplitude = abs(sum_complex)  
             phase = cmath.phase(sum_complex)
             X.append({'real': sum_complex.real,'imag': sum_complex.imag,'freq': frequence,'amp': amplitude,'phase': phase})
-        X = sorted(X, key=lambda x: x['amp'], reverse=True)
         return X
     
     def csv_to_complex(self,file):
@@ -40,10 +40,11 @@ class FourierClass(VGroup):
             reader = csv.DictReader(file)
             
             # Extract x and y values and create complex numbers
-            for row in reader:
-                x = float(row['x'])
-                y = float(row['y'])
-                complex_numbers.append(complex(x, y))
+            for i,row in enumerate(reader):
+                if i%self.index==0:
+                    x = float(row['x'])
+                    y = float(row['y'])
+                    complex_numbers.append(complex(x, y))
         
         return complex_numbers
 
